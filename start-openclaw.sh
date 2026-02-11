@@ -194,6 +194,14 @@ if (process.env.OPENCLAW_DEV_MODE === 'true') {
 // so we don't need to patch the provider config. Writing a provider
 // entry without a models array breaks OpenClaw's config validation.
 
+// Default model when using direct Anthropic API key (onboard may not set agents.defaults.model)
+if (process.env.ANTHROPIC_API_KEY && (!config.agents || !config.agents.defaults || !config.agents.defaults.model || !config.agents.defaults.model.primary)) {
+    config.agents = config.agents || {};
+    config.agents.defaults = config.agents.defaults || {};
+    config.agents.defaults.model = { primary: 'anthropic/claude-sonnet-4-5' };
+    console.log('Set default model for Anthropic: anthropic/claude-sonnet-4-5');
+}
+
 // AI Gateway model override (CF_AI_GATEWAY_MODEL=provider/model-id)
 // Adds a provider entry for any AI Gateway provider and sets it as default model.
 // Examples:

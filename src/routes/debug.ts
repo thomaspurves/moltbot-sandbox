@@ -362,6 +362,24 @@ debug.get('/env', async (c) => {
   });
 });
 
+// GET /debug/container-config-dir - List config directory (to debug sync "no config file")
+debug.get('/container-config-dir', async (c) => {
+  const sandbox = c.get('sandbox');
+  try {
+    const proc = await sandbox.startProcess('ls -la /root/.openclaw/ 2>&1 || true');
+    await new Promise((r) => setTimeout(r, 1000));
+    const logs = await proc.getLogs();
+    return c.json({
+      exitCode: proc.exitCode,
+      stdout: logs.stdout || '',
+      stderr: logs.stderr || '',
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return c.json({ error: errorMessage }, 500);
+  }
+});
+
 // GET /debug/container-config - Read the moltbot config from inside the container
 debug.get('/container-config', async (c) => {
   const sandbox = c.get('sandbox');
